@@ -9,269 +9,36 @@
       height: 100%;
       margin: 0;
       padding: 0;
-      overflow: hidden;
       font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
     }
     .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       height: 100%;
-      width: 100%;
-      position: relative;
+      text-align: center;
     }
-    #demoMap {
-      height: 100%;
-      width: 100%;
-    }
-    .popup {
-      position: absolute;
-      top: 60px;
-      left: 10px;
-      background-color: white;
-      padding: 20px;
-      border: 1px solid #ccc;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-      display: none;
-      z-index: 1000;
-      width: 300px;
-    }
-    #popup_content .row {
-      margin-top: 10px;
-    }
-    #button {
-      width: 50px;
-      height: 23px;
-      top: 8px;
-      left: 50px;
-      position: absolute;
-      border: 1px solid rgb(172, 172, 172);
-      border-radius: 2px;
-      background-color: rgb(248, 248, 248);
-    }
-    #button:hover {
-      background-color: rgb(220, 220, 220);
-      border: 1px solid rgb(120, 120, 120);
-    }
-    #checkbox {
-      width: 50px;
-      height: 23px;
-      top: 5px;
-      left: 100px;
-      position: absolute;
-    }
-    #colorSelect {
-      width: 80px;
-      height: 23px;
-      top: 8px;
-      left: 160px;
-      position: absolute;
-      background-color: rgb(248, 248, 248);
-      border-radius: 2px;
+    .data-row {
+      margin: 10px 0;
+      font-size: 1.5em;
+      color: #333;
     }
   </style>
 </head>
 <body>
   <section class="container">
-    <div id="demoMap"></div>
-    <div id="popup" class="popup">
-      <h3>Data</h3>
-      <div id="popup_content">
-        <div class="row" id="longitude">Longitude: </div>
-        <div class="row" id="latitude">Latitude: </div>
-        <div class="row" id="speed">Speed: </div>
-        <div class="row" id="signalstrength">
-          Signal Strength: 
-          <span id="signalText"></span>
-          <img id="signalImage" src="Icons/signal_empty.png" alt="Signal Strength" width="30" height="30">
-        </div>
-      </div>
-    </div>
-    <div>
-      <button id="button" title="Focus map on the marker" onclick="focusMapOnMarker(buttonLon, buttonLat)">
-        <img id="focusImage" src="Icons/focus.png" width="20" height="20">
-      </button>
-      <input type="checkbox" id="checkbox" name="markerApplyCheckbox" title="Start/stop applying a line">
-      <select name="colors" id="colorSelect" title="Choose a color for the line">
-        <option value="blue" style='font-size: 18px; color: blue;'>Blue&#9679;</option>
-        <option value="red" style='font-size: 18px; color: red;'>Red&#9679;</option>
-        <option value="green" style='font-size: 18px; color: green;'>Green&#9679;</option>
-        <option value="orange" style='font-size: 18px; color: orange;'>Orange&#9679;</option>
-        <option value="purple" style='font-size: 18px; color: purple;'>Purple&#9679;</option>
-        <option value="brown" style='font-size: 18px; color: brown;'>Brown&#9679;</option>
-      </select>
-    </div>
+    <div class="data-row" id="humidity">Humidity: --</div>
+    <div class="data-row" id="temperature">Temperature: --</div>
   </section>
-
-  <script src="https://cdn.jsdelivr.net/npm/ol@v10.2.1/dist/ol.js"></script>
   <script>
-    const images = [
-      "Icons/signal_empty.png",
-      "Icons/signal_1.png",
-      "Icons/signal_2.png",
-      "Icons/signal_3.png",
-      "Icons/signal_4.png"
-    ];
-
-    const colorSelect = document.getElementById('colorSelect');
-
-    const colorMap = {
-        blue: '#0000FF',
-        red: '#FF0000',
-        green: '#008000',
-        orange: '#FFA500',
-        purple: '#800080',
-        brown: '#A52A2A'
-    };
-
-    let map, marker, vectorLayer, buttonLat, buttonLon;
-
-    let lineSegments = [];
-    let currentLineFeature = null;
-    let lastPoint = null;
-
-    function getSignalImageIndex(signalStrength) {
-      if (signalStrength == 99) return 0;
-      if (signalStrength <= 1) return 1;
-      if (signalStrength > 1 && signalStrength < 2) return 2;
-      if (signalStrength >= 2 && signalStrength < 30) return 3;
-      return 4;
-    }
-
-    function convertColorValue(selectedValue) {
-        const colorCode = colorMap[selectedValue] || 'Unknown Color';
-        return colorCode;
-    }
-
     async function mainRead() {
-      const latestData = await getData();
+      try {
+        const latestData = await getData();
+        document.getElementById('humidity').textContent = `Humidity: ${latestData.humidity} %`;
+        document.getElementById('temperature').textContent = `Temperature: ${latestData.temperature} °C`;
 
-      document.getElementById('longitude').textContent = `Longitude: ${latestData.longitude}`;
-      document.getElementById('latitude').textContent = `Latitude: ${latestData.latitude}`;
-      document.getElementById('speed').textContent = `Speed: ${latestData.speed}`;
-      document.getElementById('signalText').textContent = `${latestData.signal_strength}`;
-
-      buttonLon = latestData.longitude;
-      buttonLat = latestData.latitude;
-
-      const signalImageIndex = getSignalImageIndex(latestData.signal_strength);
-      document.getElementById('signalImage').src = images[signalImageIndex];
-
-      updateMap(latestData.longitude, latestData.latitude, latestData);
-    }
-
-    function updateMap(longitude, latitude, latestData) {
-      const newCoordinates = ol.proj.fromLonLat([longitude, latitude]);
-
-      if (!map) {
-          map = new ol.Map({
-              target: 'demoMap',
-              layers: [
-                  new ol.layer.Tile({
-                      source: new ol.source.OSM()
-                  })
-              ],
-              view: new ol.View({
-                  center: newCoordinates,
-                  zoom: 14,
-                  maxZoom: 20
-              })
-          });
-
-          marker = new ol.Feature({
-              geometry: new ol.geom.Point(newCoordinates)
-          });
-
-          const markerIconStyle = new ol.style.Style({
-              image: new ol.style.Icon({
-                  anchor: [0.5, 1],
-                  src: 'Icons/marker_icon.png',
-                  scale: 0.075
-              })
-          });
-
-          marker.setStyle(markerIconStyle);
-
-          const markerSource = new ol.source.Vector({
-              features: [marker]
-          });
-
-          vectorLayer = new ol.layer.Vector({
-              source: markerSource
-          });
-
-          map.addLayer(vectorLayer);
-
-          addMarkerClickListener(latestData);
-          focusMapOnMarker(longitude, latitude);
-      } else {
-          marker.getGeometry().setCoordinates(newCoordinates);
-
-          if (isMarkApplierChecked()) {
-              if (!currentLineFeature) {
-                  currentLineFeature = createNewLineSegment(newCoordinates);
-              } else {
-                  const currentCoordinates = currentLineFeature.getGeometry().getCoordinates();
-                  currentCoordinates.push(newCoordinates);
-                  currentLineFeature.getGeometry().setCoordinates(currentCoordinates);
-              }
-              lastPoint = newCoordinates;
-          } else {
-              currentLineFeature = null;
-          }
-      }
-    }
-
-    function createNewLineSegment(startingPoint) {
-        const lineFeature = new ol.Feature({
-            geometry: new ol.geom.LineString([startingPoint])
-        });
-
-        lineFeature.setStyle(new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: convertColorValue(colorSelect.value),
-                width: 3
-            })
-        }));
-
-        const lineSource = new ol.source.Vector({
-            features: [lineFeature]
-        });
-
-        const lineLayer = new ol.layer.Vector({
-            source: lineSource
-        });
-
-        map.addLayer(lineLayer);
-        lineSegments.push(lineFeature);
-        return lineFeature;
-    }
-
-    function focusMapOnMarker(longitude, latitude) {
-      map.getView().setCenter(ol.proj.fromLonLat([longitude, latitude]));
-    }
-
-    function addMarkerClickListener(data) {
-      const popup = document.getElementById('popup');
-      map.on('click', function (evt) {
-        const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-          return feature;
-        });
-
-        if (feature === marker) {
-          popup.style.display = 'block';
-
-          document.getElementById('longitude').textContent = `Longitude: ${data.longitude}`;
-          document.getElementById('latitude').textContent = `Latitude: ${data.latitude}`;
-          document.getElementById('speed').textContent = `Speed: ${data.speed}`;
-          document.getElementById('signalText').textContent = `${data.signal_strength}`;
-        } else {
-          popup.style.display = 'none';
-        }
-      });
-    }
-
-    function isMarkApplierChecked(){
-      const checkBox = document.getElementById('checkbox')
-      return checkBox.checked;
-    }
 
     async function getData() {
       const response = await fetch("/api");
@@ -280,7 +47,7 @@
     }
 
     mainRead();
-    setInterval(mainRead, 500);
+    setInterval(mainRead, 2000);
   </script>
 </body>
 </html>
