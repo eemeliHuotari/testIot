@@ -38,7 +38,8 @@
         const latestData = await getData();
         document.getElementById('humidity').textContent = `Humidity: ${latestData.humidity} %`;
         document.getElementById('temperature').textContent = `Temperature: ${latestData.temperature} °C`;
-
+      }
+    }
 
     async function getData() {
       const response = await fetch("/api");
