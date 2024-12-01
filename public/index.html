@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.2.1/ol.css">
   <style>
     html, body {
       height: 100%;
@@ -36,14 +35,15 @@
     async function mainRead() {
       try {
         const latestData = await getData();
-        document.getElementById('humidity').textContent = `Humidity: ${latestData.humidity} %`;
-        document.getElementById('temperature').textContent = `Temperature: ${latestData.temperature} °C`;
+        document.getElementById('humidity').textContent = `Humidity: ${latestData.humidity}`;
+        document.getElementById('temperature').textContent = `Temperature: ${latestData.temperature}`;
       }
     }
 
     async function getData() {
       const response = await fetch("/api");
       const data = await response.json();
+      console.log(data);
       return data;
     }
 
