@@ -38,6 +38,9 @@
         document.getElementById('humidity').textContent = `Humidity: ${latestData.humidity}`;
         document.getElementById('temperature').textContent = `Temperature: ${latestData.temperature}`;
       }
+      catch (error) {
+        console.error('Error fetching data:', error);
+      }
     }
 
     async function getData() {
