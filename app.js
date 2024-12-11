@@ -28,46 +28,47 @@ const app = express();
 
 const router = require('./lib/routes/router');
 const GRAFANA_URL = 'https://grafana-test-rahti2.2.rahtiapp.fi/d/be6imr3v6w16oc/iot2024?orgId=1&from=2024-12-11T04:58:27.200Z&to=2024-12-11T10:58:27.200Z&timezone=browser';
+const RENDERER_URL = 'https://grafana-image-renderer-test-rahti2.2.rahtiapp.fi/render';
 const API_TOKEN = process.env.GRAFANA_TOKEN;
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use((error, request, response, next) => {
   if (request.body === '' || (error instanceof SyntaxError && error.type === 'entity.parse.failed')) {
     response.status(415);
     return response.send('Invalid payload!');
   }
-
   next();
 });
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', router);
 
 app.get('/grafana-image', async function (req, res) {
   try {
-    const response = await axios.get(GRAFANA_URL, {
+    const body = {
+      url: GRAFANA_URL,
+      width: 1000,
+      height: 500,
+      deviceScaleFactor: 1,
+    };
+
+    const response = await axios.post(RENDERER_URL, body, {
       headers: {
-        Authorization: `Bearer ${API_TOKEN}`,
+        "Content-Type": "application/json",
       },
-      responseType: 'arraybuffer',
     });
+
     res.set('Content-Type', 'image/png');
     res.send(response.data);
   } catch (error) {
-    console.error('Error fetching Grafana image:', error);
+    console.error('Error fetching Grafana image:', error.response ? error.response.data : error.message);
     res.status(500).send('Error fetching Grafana image');
   }
 });
 
 // Add a health check
-app.use('/ready', (request, response) => {
-  return response.sendStatus(200);
-});
-
-app.use('/live', (request, response) => {
-  return response.sendStatus(200);
-});
-
+app.use('/ready', (request, response) => response.sendStatus(200));
+app.use('/live', (request, response) => response.sendStatus(200));
 
 module.exports = app;
