@@ -30,7 +30,12 @@
   <section class="container">
     <div class="data-row" id="humidity">Humidity: --</div>
     <div class="data-row" id="temperature">Temperature: --</div>
-    <img id="grafanaImage" alt="Loading Grafana image..." />
+    <iframe
+  src="https://grafana-test-rahti2.2.rahtiapp.fi/dashboard/snapshot/kCFEnoRhmFRFgBCB8owEcPnt7IvIDV9D"
+  width="1000"
+  height="500"
+  frameborder="0"
+></iframe>
   </section>
   <script>
     async function mainRead() {
@@ -49,23 +54,7 @@
       const data = await response.json();
       return data;
     }
-    async function fetchGrafanaImage() {
-      try {
-        const response = await fetch('/grafana-image');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-        const objectURL = URL.createObjectURL(blob);
-
-        document.getElementById('grafanaImage').src = objectURL;
-      } catch (error) {
-        console.error('Error fetching Grafana image:', error);
-        document.getElementById('grafanaImage').alt = 'Failed to load Grafana image';
-      }
-    }
-    fetchGrafanaImage();
+   
     mainRead();
     setInterval(mainRead, 2000);
   </script>
