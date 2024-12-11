@@ -27,7 +27,7 @@ const axios = require('axios');
 const app = express();
 
 const router = require('./lib/routes/router');
-const GRAFANA_URL = 'https://grafana-test-rahti2.2.rahtiapp.fi/render/d-solo/be6imr3v6w16oc/iot2024?orgId=1&from=2024-12-11T04:58:27.200Z&to=2024-12-11T10:58:27.200Z&timezone=browser';
+const GRAFANA_URL = 'https://grafana-test-rahti2.2.rahtiapp.fi/d/be6imr3v6w16oc/iot2024?orgId=1&from=2024-12-11T04:58:27.200Z&to=2024-12-11T10:58:27.200Z&timezone=browser';
 const API_TOKEN = process.env.GRAFANA_TOKEN;
 
 app.use(bodyParser.json());
