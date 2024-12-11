@@ -41,7 +41,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', router);
 
-app.use('/grafana-image,' router);
 
 // Add a health check
 app.use('/ready', (request, response) => {
