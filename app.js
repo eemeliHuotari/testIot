@@ -29,7 +29,7 @@ const app = express();
 const router = require('./lib/routes/router');
 const GRAFANA_URL = 'https://grafana-test-rahti2.2.rahtiapp.fi/render/d-solo/be6imr3v6w16oc/iot2024?orgId=1&from=2024-12-11T04:58:27.200Z&to=2024-12-11T10:58:27.200Z&timezone=browser';
 const RENDERER_URL = 'https://grafana-image-renderer-test-rahti2.2.rahtiapp.fi/render';
-const GRAFANA_TOKEN = process.env.GRAFANA_TOKEN;
+const API_TOKEN = process.env.GRAFANA_TOKEN;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -46,29 +46,39 @@ app.use('/api', router);
 
 app.get('/grafana-image', async function (req, res) {
   try {
-    const body = {
+    // Step 1: Fetch the dashboard image or panel data
+    const grafanaResponse = await axios.get(GRAFANA_URL, {
+      headers: {
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+      responseType: 'arraybuffer', // Fetch raw image data as an array buffer
+    });
+
+    // Step 2: Prepare the payload for the Grafana Image Renderer
+    const rendererPayload = {
       url: GRAFANA_URL,
       width: 1000,
       height: 500,
       deviceScaleFactor: 1,
     };
 
-    const response = await axios.post(RENDERER_URL, body, {
+    // Step 3: Call the Grafana Image Renderer
+    const renderResponse = await axios.post(RENDERER_URL, rendererPayload, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${GRAFANA_TOKEN}`,
+        Authorization: `Bearer ${API_TOKEN}`,
       },
+      responseType: 'arraybuffer',
     });
 
     res.set('Content-Type', 'image/png');
-    res.send(response.data);
+    res.send(renderResponse.data);
   } catch (error) {
-    console.error('Error fetching Grafana image:', error.response ? error.response.data : error.message);
-    res.status(500).send('Error fetching Grafana image');
+    console.error('Error fetching or rendering Grafana image:', error.response?.data || error.message);
+    res.status(500).send('Error fetching or rendering Grafana image');
   }
 });
 
-// Add a health check
 app.use('/ready', (request, response) => response.sendStatus(200));
 app.use('/live', (request, response) => response.sendStatus(200));
 
