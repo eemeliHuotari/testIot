@@ -22,7 +22,6 @@ const logger = require('./logger.js');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const axios = require('axios');
 
 const app = express();
 
@@ -44,48 +43,6 @@ app.use((error, request, response, next) => {
 
 app.use('/api', router);
 
-app.get('/grafana-image', async function (req, res) {
-  try {
-    const rendererPayload = {
-      url: GRAFANA_URL,
-      width: 1000,
-      height: 500,
-      deviceScaleFactor: 1,
-    };
-
-    console.log('Sending request to Renderer with payload:', rendererPayload);
-
-    const renderResponse = await axios.post(RENDERER_URL, rendererPayload, {
-      headers: {
-        "Content-Type": "application/json"
-      },
-      responseType: 'arraybuffer',
-    });
-
-    const contentType = renderResponse.headers['content-type'];
-
-    if (contentType === 'application/json') {
-      const jsonResponse = JSON.parse(renderResponse.data.toString('utf-8'));
-      console.error('Renderer returned JSON response:', jsonResponse);
-      return res.status(500).json({
-        error: 'Error rendering image',
-        details: jsonResponse,
-      });
-    } else if (contentType === 'image/png') {
-      res.set('Content-Type', 'image/png');
-      res.send(renderResponse.data);
-    } else {
-      console.error('Unexpected response from Renderer:', contentType);
-      return res.status(500).send('Unexpected response from Renderer');
-    }
-  } catch (error) {
-    console.error('Error fetching or rendering Grafana image:', error.response?.data?.toString() || error.message);
-    res.status(500).json({
-      error: 'Error fetching or rendering Grafana image',
-      details: error.response?.data?.toString() || error.message,
-    });
-  }
-});
 
 app.use('/ready', (request, response) => response.sendStatus(200));
 app.use('/live', (request, response) => response.sendStatus(200));
