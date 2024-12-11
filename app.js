@@ -22,10 +22,13 @@ const logger = require('./logger.js');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const axios = require('axios');
 
 const app = express();
 
 const router = require('./lib/routes/router');
+const GRAFANA_URL = 'https://grafana-test-rahti2.2.rahtiapp.fi/render/d-solo/your-dashboard-id';
+const API_TOKEN = process.env.GRAFANA_TOKEN;
 
 app.use(bodyParser.json());
 app.use((error, request, response, next) => {
@@ -41,6 +44,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', router);
 
+app.get('/grafana-image', async function (req, res) {
+  try {
+    const response = await axios.get(GRAFANA_URL, {
+      headers: {
+        Authorization: `Bearer ${API_TOKEN}`,
+      },
+      responseType: 'arraybuffer',
+    });
+    res.set('Content-Type', 'image/png');
+    res.send(response.data);
+  } catch (error) {
+    console.error('Error fetching Grafana image:', error);
+    res.status(500).send('Error fetching Grafana image');
+  }
+});
 
 // Add a health check
 app.use('/ready', (request, response) => {
