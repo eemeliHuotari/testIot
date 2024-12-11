@@ -11,7 +11,7 @@ app.engine('html', require('ejs').renderFile);
 app.use(morgan('combined'));
 
 
-const GRAFANA_URL = 'https://grafana-test-rahti2.2.rahtiapp.fi/render/d-solo/iot2024';
+const GRAFANA_URL = 'https://grafana-test-rahti2.2.rahtiapp.fi/render/d-solo/be6imr3v6w16oc/iot2024?orgId=1&from=2024-12-11T04:27:55.585Z&to=2024-12-11T10:27:55.585Z&timezone=browser';
 const API_TOKEN = process.env.GRAFANA_TOKEN;
 
 
