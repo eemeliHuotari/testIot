@@ -65,8 +65,7 @@ app.get('/grafana-image', async function (req, res) {
     // Step 3: Call the Grafana Image Renderer
     const renderResponse = await axios.post(RENDERER_URL, rendererPayload, {
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_TOKEN}`,
+        "Content-Type": "application/json"
       },
       responseType: 'arraybuffer',
     });
