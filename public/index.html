@@ -32,8 +32,12 @@
   </style>
 </head>
 <body>
+  <div id="humidity" class="data-row"></div>
+  <div id="temperature" class="data-row"></div>
+  <div class="container">
     <canvas id="humidityGauge" width="400" height="400"></canvas>
     <canvas id="temperatureGauge" width="400" height="400"></canvas>
+  </div>
   </section>
   <script>
     async function mainRead() {
