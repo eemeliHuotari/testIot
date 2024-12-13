@@ -38,17 +38,6 @@ app.use((error, request, response, next) => {
   next();
 });
 
-app.get('/grafana', async (req, res) => {
-    const grafanaUrl = 'https://grafana-test-rahti2.2.rahtiapp.fi/d/be6imr3v6w16oc/iot2024?orgId=1';
-    try {
-        const response = await axios.get(grafanaUrl, {
-            headers: { Authorization: `Bearer ${process.env.GRAFANA_KEY}` }
-        });
-        res.send(response.data);
-    } catch (error) {
-        res.status(500).send('Error fetching Grafana dashboard');
-    }
-});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
