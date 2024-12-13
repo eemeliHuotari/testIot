@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-gauge@0.3.1/dist/chartjs-chart-gauge.min.js"></script>
   <style>
     html, body {
       height: 100%;
@@ -10,6 +12,9 @@
       padding: 0;
       font-family: Arial, sans-serif;
       background-color: #f4f4f9;
+    }
+    canvas {
+      margin: 20px;
     }
     .container {
       display: flex;
@@ -27,13 +32,9 @@
   </style>
 </head>
 <body>
-  <section class="container">
-    <div class="data-row" id="humidity">Humidity: --</div>
-    <div class="data-row" id="temperature">Temperature: --</div>
-   <iframe src="https://grafana-test-rahti2.2.rahtiapp.fi/d/ae6sm5ltq6olce/iot2024?orgId=1&from=now-6h&to=now&timezone=browser&viewPanel=panel-2&__feature.dashboardSceneSolo" width="450" height="200" frameborder="0"></iframe>
-    <iframe src="https://grafana-test-rahti2.2.rahtiapp.fi/d/ae6sm5ltq6olce/iot2024?orgId=1&from=now-6h&to=now&timezone=browser&viewPanel=panel-1&__feature.dashboardSceneSolo" width="450" height="200" frameborder="0"></iframe>
+    <canvas id="humidityGauge" width="400" height="400"></canvas>
+    <canvas id="temperatureGauge" width="400" height="400"></canvas>
   </section>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     async function mainRead() {
       try {
@@ -50,6 +51,73 @@
       const response = await fetch("/api");
       const data = await response.json();
       return data;
+    }
+    function createHumidityGauge(humidity) {
+      const ctx = document.getElementById('humidityGauge').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'gauge',
+        data: {
+          datasets: [{
+            data: [humidity],
+            backgroundColor: ['#ffcc00'],
+            borderWidth: 0,
+            radius: '100%',
+            needleValue: humidity,
+          }]
+        },
+        options: {
+          rotation: 1 * Math.PI,
+          circumference: 1 * Math.PI,
+          needle: {
+            needleColor: 'black',
+            needleWidth: 2,
+            needleRadiusPercentage: 0.7
+          },
+          scale: {
+            display: true,
+            max: 100,
+            min: 0,
+            steps: 10,
+            stepValue: 10,
+            unit: '%'
+          }
+        }
+      });
+    }
+
+    function createTemperatureGauge(temperature) {
+      const ctx = document.getElementById('temperatureGauge').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'gauge',
+        data: {
+          datasets: [{
+            data: [temperature],
+            backgroundColor: ['#ff5733'],
+            borderWidth: 0,
+            radius: '100%',
+            needleValue: temperature,
+          }]
+        },
+        options: {
+          rotation: 1 * Math.PI,
+          circumference: 1 * Math.PI,
+          needle: {
+            needleColor: 'black',
+            needleWidth: 2,
+            needleRadiusPercentage: 0.7
+          },
+          scale: {
+            display: true,
+            max: 30,
+            min: -30,
+            steps: 10,
+            stepValue: 10,
+            unit: '°C'
+          }
+        }
+      });
     }
    
     mainRead();
