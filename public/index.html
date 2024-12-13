@@ -13,6 +13,8 @@
       background-color: #f4f4f9;
     }
     canvas {
+      width: 400px;
+      height: 400px;
       margin: 20px;
       border: 1px solid #000;
     }
@@ -64,7 +66,7 @@
 
     function createHumidityGauge(humidity) {
       const ctx = document.getElementById('humidityGauge').getContext('2d');
-
+      console.log('Creating humidity Gauge');
       humidityGauge = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -101,7 +103,7 @@
 
     function createTemperatureGauge(temperature) {
       const ctx = document.getElementById('temperatureGauge').getContext('2d');
-
+      console.log('Creating Temperature Gauge');
       temperatureGauge = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -137,9 +139,11 @@
     }
 
     function updateHumidityGauge(humidity) {
+      console.log('Updating Humidity Gauge');
       if (humidityGauge) {
         humidityGauge.data.datasets[0].data = [humidity, 100 - humidity];
         humidityGauge.update();
+        console.log('Updated Humidity Gauge');
       }
     }
 
