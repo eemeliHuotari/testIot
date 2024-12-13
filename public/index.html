@@ -41,8 +41,11 @@
 
   <script>
     let humidityGauge, temperatureGauge;
-    Chart.register(window.ChartJsChartGauge.GaugeController);
-   
+    try {
+      Chart.register(Chart.GaugeController || window.ChartJsChartGauge.GaugeController);
+    } catch (error) {
+      console.error("Error registering GaugeController:", error);
+    }
     async function mainRead() {
       try {
         const latestData = await getData();
