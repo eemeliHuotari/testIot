@@ -66,7 +66,7 @@
 
     function createHumidityGauge(humidity) {
       const ctx = document.getElementById('humidityGauge').getContext('2d');
-      console.log('Creating humidity Gauge');
+    
       humidityGauge = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -94,16 +94,17 @@
           scales: {
             r: {
               min: 0,
-              max: 100
+              max: 100,
+              display: false,
             }
           }
         }
       });
     }
-
+    
     function createTemperatureGauge(temperature) {
       const ctx = document.getElementById('temperatureGauge').getContext('2d');
-      console.log('Creating Temperature Gauge');
+    
       temperatureGauge = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -131,7 +132,8 @@
           scales: {
             r: {
               min: -30,
-              max: 30
+              max: 30,
+              display: false,
             }
           }
         }
