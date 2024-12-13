@@ -41,9 +41,8 @@
 
   <script>
     let humidityGauge, temperatureGauge;
-    const { GaugeController } = ChartGauge;
-    Chart.register(GaugeController);
-    
+    Chart.register(window.ChartJsChartGauge.GaugeController);
+   
     async function mainRead() {
       try {
         const latestData = await getData();
@@ -144,7 +143,9 @@
         temperatureGauge.update();
       }
     }
-
+    createHumidityGauge(0);
+    createTemperatureGauge(0);
+    
     mainRead();
     setInterval(mainRead, 2000);
   </script>
