@@ -41,7 +41,9 @@
 
   <script>
     let humidityGauge, temperatureGauge;
-
+    const { GaugeController } = ChartGauge;
+    Chart.register(GaugeController);
+    
     async function mainRead() {
       try {
         const latestData = await getData();
