@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-gauge@0.3.1/dist/chartjs-chart-gauge.min.js"></script>
   <style>
     html, body {
       height: 100%;
@@ -41,11 +40,7 @@
 
   <script>
     let humidityGauge, temperatureGauge;
-    try {
-      Chart.register(Chart.GaugeController || window.ChartJsChartGauge.GaugeController);
-    } catch (error) {
-      console.error("Error registering GaugeController:", error);
-    }
+
     async function mainRead() {
       try {
         const latestData = await getData();
@@ -65,35 +60,39 @@
       return data;
     }
 
+
     function createHumidityGauge(humidity) {
       const ctx = document.getElementById('humidityGauge').getContext('2d');
 
       humidityGauge = new Chart(ctx, {
-        type: 'gauge',
+        type: 'doughnut',
         data: {
           datasets: [{
-            data: [humidity],
-            backgroundColor: ['#ffcc00'],
+            data: [humidity, 100 - humidity],
+            backgroundColor: ['#ffcc00', '#e0e0e0'],
             borderWidth: 0,
-            radius: '100%',
-            needleValue: humidity,
+            radius: '90%',
+            rotation: -Math.PI,
           }]
         },
         options: {
-          rotation: 1 * Math.PI,
-          circumference: 1 * Math.PI,
-          needle: {
-            needleColor: 'black',
-            needleWidth: 2,
-            needleRadiusPercentage: 0.7
+          responsive: true,
+          cutout: '75%',
+          rotation: -Math.PI,
+          circumference: Math.PI,
+          plugins: {
+            tooltip: {
+              enabled: false
+            },
+            legend: {
+              display: false
+            }
           },
-          scale: {
-            display: true,
-            max: 100,
-            min: 0,
-            steps: 10,
-            stepValue: 10,
-            unit: '%'
+          scales: {
+            r: {
+              min: 0,
+              max: 100
+            }
           }
         }
       });
@@ -103,31 +102,34 @@
       const ctx = document.getElementById('temperatureGauge').getContext('2d');
 
       temperatureGauge = new Chart(ctx, {
-        type: 'gauge',
+        type: 'doughnut',
         data: {
           datasets: [{
-            data: [temperature],
-            backgroundColor: ['#ff5733'],
+            data: [temperature + 30, 60],
+            backgroundColor: ['#ff5733', '#e0e0e0'],
             borderWidth: 0,
-            radius: '100%',
-            needleValue: temperature,
+            radius: '90%',
+            rotation: -Math.PI,
           }]
         },
         options: {
-          rotation: 1 * Math.PI,
-          circumference: 1 * Math.PI,
-          needle: {
-            needleColor: 'black',
-            needleWidth: 2,
-            needleRadiusPercentage: 0.7
+          responsive: true,
+          cutout: '75%',
+          rotation: -Math.PI,
+          circumference: Math.PI,
+          plugins: {
+            tooltip: {
+              enabled: false
+            },
+            legend: {
+              display: false
+            }
           },
-          scale: {
-            display: true,
-            max: 30,
-            min: -30,
-            steps: 10,
-            stepValue: 10,
-            unit: '°C'
+          scales: {
+            r: {
+              min: -30,
+              max: 30
+            }
           }
         }
       });
@@ -135,20 +137,18 @@
 
     function updateHumidityGauge(humidity) {
       if (humidityGauge) {
-        humidityGauge.data.datasets[0].data = [humidity];
+        humidityGauge.data.datasets[0].data = [humidity, 100 - humidity];
         humidityGauge.update();
       }
     }
 
     function updateTemperatureGauge(temperature) {
       if (temperatureGauge) {
-        temperatureGauge.data.datasets[0].data = [temperature];
+        temperatureGauge.data.datasets[0].data = [temperature + 30, 60];
         temperatureGauge.update();
       }
     }
-    createHumidityGauge(0);
-    createTemperatureGauge(0);
-    
+
     mainRead();
     setInterval(mainRead, 2000);
   </script>
