@@ -58,10 +58,22 @@
       flex-direction: column;
       justify-content: space-between;
       height: 100%;
+      align-items: flex-start;
     }
 
     .label {
+      position: relative;
       text-align: center;
+    }
+    .label:before {
+      content: "";
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 1px;
+      background-color: #333;
     }
 
     .thermometer-name {
@@ -90,7 +102,15 @@
         <div class="mercury" id="humidityMercury"></div>
         <div class="labels">
           <div class="label">100%</div>
+          <div class="label">90%</div>
+          <div class="label">80%</div>
+          <div class="label">70%</div>
+          <div class="label">60%</div>
           <div class="label">50%</div>
+          <div class="label">40%</div>
+          <div class="label">30%</div>
+          <div class="label">20%</div>
+          <div class="label">10%</div>
           <div class="label">0%</div>
         </div>
       </div>
@@ -103,7 +123,13 @@
         <div class="mercury" id="temperatureMercury"></div>
         <div class="labels">
           <div class="label">50°C</div>
+          <div class="label">40°C</div>
+          <div class="label">30°C</div>
+          <div class="label">20°C</div>
           <div class="label">0°C</div>
+          <div class="label">-20°C</div>
+          <div class="label">-30°C</div>
+          <div class="label">-40°C</div>
           <div class="label">-50°C</div>
         </div>
       </div>
