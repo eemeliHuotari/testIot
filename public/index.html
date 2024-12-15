@@ -40,9 +40,11 @@
       left: 50%;
       transform: translateX(-50%);
       width: 40px;
-      background-color: #ff5733;
+      background: linear-gradient(to top, rgb(135, 135, 255), rgb(255, 135, 135));
+      transition: height 0.5s ease, background-position 0.5s ease;
       border-radius: 25px;
-      transition: height 0.5s ease;
+      background-size: 100% 500px;
+      background-position: bottom;
     }
 
 
@@ -147,7 +149,6 @@
       return data;
     }
 
-
     function updateHumidityThermometer(humidity) {
       const mercury = document.getElementById('humidityMercury');
       const height = (humidity / 100) * 100;
@@ -172,7 +173,6 @@
         console.error('Error fetching data:', error);
       }
     }
-
 
     mainRead();
     setInterval(mainRead, 2000);
