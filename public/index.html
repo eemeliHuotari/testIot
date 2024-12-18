@@ -85,7 +85,7 @@
       margin-top: 10px;
     }
 
-    .thermometer-item {
+    .thermometer-item, .pressure-item {
       text-align: center;
       margin-bottom: 20px;
     }
@@ -93,6 +93,14 @@
     .thermometer-value {
       font-size: 1.2em;
       margin-top: 10px;
+    }
+
+    .pressure-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5em;
     }
   </style>
 </head>
@@ -142,6 +150,11 @@
     </div>
   </div>
 
+  <div class="pressure-item">
+    <div class="thermometer-name">Pressure</div>
+    <div id="pressure" class="thermometer-value">Pressure: 1001 hPa</div>
+  </div>
+  
   <script>
     async function getData() {
       const response = await fetch("/api");
@@ -166,7 +179,8 @@
         const latestData = await getData();
         document.getElementById('humidity').textContent = `Humidity: ${latestData.humidity}%`;
         document.getElementById('temperature').textContent = `Temperature: ${latestData.temperature}°C`;
-
+        document.getElementById('pressure').textContent = `Pressure: ${latestData.pressure} hPa`;
+        
         updateHumidityThermometer(latestData.humidity);
         updateTemperatureThermometer(latestData.temperature);
       } catch (error) {
